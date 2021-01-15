@@ -2,9 +2,7 @@ package cn.itcast.jedis.test;
 
 import cn.itcast.jedis.util.JedisPoolUtils;
 import org.junit.Test;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.*;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +12,7 @@ import java.util.Set;
  * jedis的测试类
  */
 public class JedisTest {
-
+    private Integer max_allowed_times = 10;
 
     /**
      * 快速入门
@@ -203,6 +201,44 @@ public class JedisTest {
         jedis.close();
     }
 
+    /**
+     * jedis 生存时间、val自增
+     */
+    @Test
+    public void test9(){
+        //通过连接池工具类获取
+        Jedis jedis = JedisPoolUtils.getJedis();
+        boolean flag = true;
+        String key = "oms";
+        //判断是否存在key
+        if(jedis.exists(key)){
+            // key对应的value自加1
+            jedis.incr(key);
+            // 取得key对应的value
+            String value = jedis.get(key);
+//            jedis.set(key,Integer.parseInt(value)+1+"");
+            if (Integer.parseInt(value) > max_allowed_times) {
+                flag = false;
+            }
+            System.out.println(value+","+flag);
+        }else{
+            // 第一次访问，设置初始值1
+            jedis.set(key, "1");
+            // 设置生存时间60秒
+            jedis.expire(key, 5);
+        }
+    }
+    @Test
+    public void test10(){
+        test9();
+        try {
+            Thread.sleep(1000*10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        test9();
+
+    }
 
 
 }
