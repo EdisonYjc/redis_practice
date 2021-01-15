@@ -209,7 +209,7 @@ public class JedisTest {
         //通过连接池工具类获取
         Jedis jedis = JedisPoolUtils.getJedis();
         boolean flag = true;
-        String key = "oms";
+        String key = "123";
         //判断是否存在key
         if(jedis.exists(key)){
             // key对应的value自加1
